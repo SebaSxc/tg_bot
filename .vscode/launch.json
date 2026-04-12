@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Bot (Prompt Token)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/class_signup_bot.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "TELEGRAM_BOT_TOKEN": "${input:telegramBotToken}",
+        "TEACHER_ID": "${input:teacherId}"
+      }
+    },
+    {
+      "name": "Run Bot (.env)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/class_signup_bot.py",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "telegramBotToken",
+      "type": "promptString",
+      "description": "Telegram bot token from BotFather",
+      "password": true
+    },
+    {
+      "id": "teacherId",
+      "type": "promptString",
+      "description": "Teacher/admin Telegram user ID",
+      "default": "6158059440"
+    }
+  ]
+}
