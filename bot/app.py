@@ -1,10 +1,19 @@
 from telegram.ext import Application, CallbackQueryHandler, CommandHandler, MessageHandler, filters
 
-from .handlers.admin import admin_cancel_appointment, manage_days, reset, toggle_day, view_appointments
-from .config import TOKEN
-from .handlers.admin import admin_cancel_appointment, reset, view_appointments
 from .handlers.common import ask_name, main_menu, save_name
+from .config import TOKEN
+from .handlers.admin import (
+    admin_cancel_appointment,
+    admin_calendar_nav,
+    admin_view_day,
+    manage_days,
+    reset,
+    toggle_day,
+    view_appointments
+)
 from .handlers.user import (
+    calendar_nav,
+    ignore_click,
     cancel,
     cancel_select,
     change,
@@ -47,6 +56,12 @@ def build_application():
 
     app.add_handler(CallbackQueryHandler(manage_days, pattern="^manage_days$"))
     app.add_handler(CallbackQueryHandler(toggle_day, pattern="^adm_toggle_"))
+
+    app.add_handler(CallbackQueryHandler(ignore_click, pattern="^ignore$"))
+    app.add_handler(CallbackQueryHandler(calendar_nav, pattern="^cal_nav_"))
+
+    app.add_handler(CallbackQueryHandler(admin_calendar_nav, pattern="^adm_cal_nav_"))
+    app.add_handler(CallbackQueryHandler(admin_view_day, pattern="^adm_day_"))
 
     return app
 

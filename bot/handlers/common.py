@@ -15,17 +15,22 @@ from ..state import (
 
 
 def build_main_menu_markup(user_id):
-    keyboard = [
-        [InlineKeyboardButton("📅 Записаться", callback_data="signup")],
-        [InlineKeyboardButton("🔍 Мои записи", callback_data="mybookings")],
-        [InlineKeyboardButton("⏳ Изменить запись", callback_data="change")],
-        [InlineKeyboardButton("❌ Отменить мою запись", callback_data="cancel")],
-    ]
-
     if user_id == TEACHER_ID:
-        keyboard.append([InlineKeyboardButton("📋 Все записи", callback_data="view")])
-        keyboard.append([InlineKeyboardButton("🔒 Закрыть/открыть день", callback_data="manage_days")])
-        keyboard.append([InlineKeyboardButton("🔄 Сбросить все записи", callback_data="reset")])
+        # Укороченное меню только для преподавателя
+        keyboard = [
+            [InlineKeyboardButton("✍️ Записать ученика", callback_data="signup")],
+            [InlineKeyboardButton("📋 Все записи", callback_data="view")],
+            [InlineKeyboardButton("🔒 Закрыть/открыть день", callback_data="manage_days")],
+            [InlineKeyboardButton("🔄 Сбросить все записи", callback_data="reset")],
+        ]
+    else:
+        # Стандартное меню для ученика
+        keyboard = [
+            [InlineKeyboardButton("📅 Записаться", callback_data="signup")],
+            [InlineKeyboardButton("🔍 Мои записи", callback_data="mybookings")],
+            [InlineKeyboardButton("⏳ Изменить запись", callback_data="change")],
+            [InlineKeyboardButton("❌ Отменить мою запись", callback_data="cancel")],
+        ]
 
     return InlineKeyboardMarkup(keyboard)
 
@@ -90,16 +95,24 @@ async def save_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await main_menu(update, context)
             return
 
-        # Уникальный виртуальный ID для ученика
-        virtual_user_id = -int(datetime.now().timestamp() * 1000)
+        # Ищем, есть ли уже такой ученик в базе по фамилии (без учета регистра)
+        target_user_id = None
+        for uid, name in user_names.items():
+            if name.strip().lower() == text.lower():
+                target_user_id = uid
+                break
 
-        user_names[virtual_user_id] = text
-        appointments.setdefault(virtual_user_id, []).append(slot)
+        # Если не нашли — создаем новый виртуальный ID
+        if target_user_id is None:
+            target_user_id = -int(datetime.now().timestamp() * 1000)
+            user_names[target_user_id] = text
+
+        appointments.setdefault(target_user_id, []).append(slot)
         appointment_times[slot] = get_slot_datetime(date_str, time_range)
         save_state()
 
         await message.reply_text(
-            f"✅ Ученик <b>{text}</b> успешно записан на <b>{format_slot(slot, prefix='')}</b>!",
+            f"✅ Ученик <b>{user_names[target_user_id]}</b> успешно записан на <b>{format_slot(slot, prefix='')}</b>!",
             parse_mode="HTML",
         )
         await main_menu(update, context)

@@ -9,21 +9,30 @@ blocked_dates = set()
 
 
 def load_state():
-    global user_names, appointments, appointment_times, blocked_dates
     if not DATA_FILE.exists():
         return
 
     try:
         with open(DATA_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
-            user_names = {int(k): v for k, v in data.get("user_names", {}).items()}
-            appointments = {int(k): v for k, v in data.get("appointments", {}).items()}
-            appointment_times = {
+            
+            # Очищаем и обновляем текущие объекты, не создавая новые
+            user_names.clear()
+            user_names.update({int(k): v for k, v in data.get("user_names", {}).items()})
+            
+            appointments.clear()
+            appointments.update({int(k): v for k, v in data.get("appointments", {}).items()})
+            
+            appointment_times.clear()
+            appointment_times.update({
                 k: datetime.fromisoformat(v) for k, v in data.get("appointment_times", {}).items()
-            }
-            blocked_dates = set(data.get("blocked_dates", []))
-    except Exception:
-        pass
+            })
+            
+            blocked_dates.clear()
+            blocked_dates.update(data.get("blocked_dates", []))
+            
+    except Exception as e:
+        print(f"Ошибка загрузки JSON: {e}")
 
 
 def save_state():
