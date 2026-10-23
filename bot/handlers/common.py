@@ -21,7 +21,6 @@ def build_main_menu_markup(user_id):
             [InlineKeyboardButton("✍️ Записать ученика", callback_data="signup")],
             [InlineKeyboardButton("📋 Все записи", callback_data="view")],
             [InlineKeyboardButton("🔒 Закрыть/открыть день", callback_data="manage_days")],
-            [InlineKeyboardButton("🔄 Сбросить все записи", callback_data="reset")],
         ]
     else:
         # Стандартное меню для ученика
